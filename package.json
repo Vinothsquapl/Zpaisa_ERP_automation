@@ -1,0 +1,11 @@
+{
+  "name": "Zpaisa_erp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
+    "@types/node": "^20.11.5"
+  },
+  "scripts": {}
+}
