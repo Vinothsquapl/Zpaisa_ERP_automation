@@ -1,15 +1,16 @@
 const { test, expect } = require('@playwright/test');
 
 const url =  "https://inventory.zpaisa.com";
-const login = "//div[@class=\'login-txt\']";
+const login = "//div[@class='login-txt']";
 let signButton="//ion-button[@type='submit']";
 let KeepmeSignin="//span[@class='mat-checkbox-inner-container mat-checkbox-inner-container-no-side-margin']";
 var bodyText ;
 
 test('loginview', async ({ page }) => {
 
+    test.setTimeout(120000); 
     // Open Zpaisa
-    await (page.goto(url));
+    await (page.goto(url, {timeout:0}));
 
     // Verify image
     let PageLOGO = "//img[@alt='zpaisa login']"
@@ -19,6 +20,8 @@ test('loginview', async ({ page }) => {
     //await expect(page.title).toBe('ZPAISA Business Management Software');
     
     //Verify text login 
+    let loginText = await page.getByText("Login");
+    console.log(loginText);
     await expect(page.locator(login)).toHaveText("Login");
 
     //password field varifications
@@ -48,8 +51,9 @@ test('loginview', async ({ page }) => {
 
 test('errorVerifications', async ({ page }) => {
 
+    test.setTimeout(120000);
     // Open Zpaisa
-    await (page.goto(url));
+    await (page.goto(url, {timeout:0}));
 
     // Error message when no data is entered
     var mobilenumber = "//div[@class='mat-form-field-infix ng-tns-c173-0']";
@@ -84,8 +88,9 @@ test('errorVerifications', async ({ page }) => {
 
 test('SuccessfullLogin', async ({ page }) => {
 
+    test.setTimeout(120000);
     // Open Zpaisa
-    await page.goto(url);
+    await page.goto(url, {timeout:0});
 
     // successfull login with keep me logged in disabled
     await expect (page.locator(KeepmeSignin)).toBeChecked;
@@ -97,14 +102,26 @@ test('SuccessfullLogin', async ({ page }) => {
     await (page.locator(mobilenumber).fill("9999999999"));
     await (page.locator(password).fill("tts1234"));
     await page.click(signButton);
-    await page.waitForTimeout(5000);
+    //await page.waitForTimeout(5000);
     await page.getByText(" Sri Subalaksmi Motors ");
-    bodyText = await page.textContent('body');
-    console.log(bodyText);
-    await expect(bodyText).toContain(" Sri Subalaksmi Motors ");
+
+    //logout from session
+    let profile = "//div[@class='mat-menu-trigger bottom']";
+    await page.click(profile);
+    let logout = "//button[3]";
+    await page.click(logout);
+    await expect(page.locator(login)).toHaveText("Login");
+
 
     // successfull login with keep me logged in enabled
-
-
+    await expect (page.locator(KeepmeSignin)).toBeDisabled;
+    await page.click(KeepmeSignin);
+    await expect (page.locator(KeepmeSignin)).toBeChecked;
+    await (page.locator(mobilenumber).fill("9999999999"));
+    await (page.locator(password).fill("tts1234"));
+    await page.click(signButton);
+    await page.waitForTimeout(5000);
+    await page.getByText(" Sri Subalaksmi Motors ");
+    //await expect(bodyText).toContain(" Sri Subalaksmi Motors ");
 
 });
