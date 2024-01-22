@@ -8,8 +8,11 @@ test('Zpaisalogin', async ({ page }) => {
     let PageLOGO = "//img[@alt='zpaisa login']"
     await expect(page.locator(PageLOGO)).toBeVisible
     // // Verify page title
-    // const title = await page.title();
-    // expect(title).toBe('ZPAISA Business Management Software');
+    const element = await this.page.getByText(/Zpaisa/);
+    const isVisible = await element.isVisible();
+    console.log(isVisible);
+
+
     //Verify text login 
     let login = "//div[@class='login-txt']"
     await expect(page.locator(login)).toHaveText("Login");
@@ -31,16 +34,17 @@ test('Zpaisalogin', async ({ page }) => {
     await (page.click(login));
     expect(bodyText).toContain("Password");
     // verify checkbox
-    let KeepmeSignin="//span[@class='mat-checkbox-inner-container mat-checkbox-inner-container-no-side-margin']"
-    await expect (page.locator(KeepmeSignin)).toBeChecked;
+    let KeepmeSignin = "//span[@class='mat-checkbox-inner-container mat-checkbox-inner-container-no-side-margin']"
+    await expect(page.locator(KeepmeSignin)).toBeChecked;
     // verify signin button is not disabled
-    let siginButton="//form[@class='inputs-list ng-pristine ng-invalid ng-touched']"
-    await expect (page.locator(siginButton)).toBeDisabled;
+    let siginButton = "//form[@class='inputs-list ng-pristine ng-invalid ng-touched']"
+    await expect(page.locator(siginButton)).toBeDisabled;
     // Verify Wrong phone number format
-    expect (page.locator(mobilenumber).fill("ABC"));
+    expect(page.locator(mobilenumber).fill("ABC"));
     await (page.click(login));
     let pageText = await page.textContent('body')
-    console.log(pageText);
-    expect (pageText).toContain("Wrong phone ");
+    expect(pageText).toContain("Wrong phone ");
+
+
 
 });
