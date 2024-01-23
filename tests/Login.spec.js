@@ -16,16 +16,8 @@ test('loginview', async ({ page }) => {
     await expect(page.locator(PageLOGO)).toBeVisible
 
     // // Verify page title
-<<<<<<< HEAD
-    const element = await this.page.getByText(/Zpaisa/);
-    const isVisible = await element.isVisible();
-    console.log(isVisible);
-
-
-=======
     //await expect(page.title).toBe('ZPAISA Business Management Software');
     
->>>>>>> fc8b772094ccfdbbceefebdd522d4dd687f159d6
     //Verify text login 
     await expect(page.locator(login)).toHaveText("Login");
 
@@ -65,27 +57,10 @@ test('errorVerifications', async ({ page }) => {
     var password = "//div[@class='mat-form-field-infix ng-tns-c173-1']";
     await (page.click(password));
     await (page.click(login));
-<<<<<<< HEAD
-    expect(bodyText).toContain("Password");
-    // verify checkbox
-    let KeepmeSignin = "//span[@class='mat-checkbox-inner-container mat-checkbox-inner-container-no-side-margin']"
-    await expect(page.locator(KeepmeSignin)).toBeChecked;
-    // verify signin button is not disabled
-    let siginButton = "//form[@class='inputs-list ng-pristine ng-invalid ng-touched']"
-    await expect(page.locator(siginButton)).toBeDisabled;
-    // Verify Wrong phone number format
-    expect(page.locator(mobilenumber).fill("ABC"));
-    await (page.click(login));
-    let pageText = await page.textContent('body')
-    expect(pageText).toContain("Wrong phone ");
-
-
-=======
     await expect (page.locator(signButton)).toBeDisabled;
     bodyText = await page.textContent('body');
     expect(bodyText).toContain("Phone # is required");
     expect(bodyText).toContain("Password is required");
->>>>>>> fc8b772094ccfdbbceefebdd522d4dd687f159d6
 
     // Incorrect phonenumber format
     var mobilenumber = "//input[@id='mat-input-0']";
