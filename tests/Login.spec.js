@@ -20,8 +20,6 @@ test('loginview', async ({ page }) => {
     //await expect(page.title).toBe('ZPAISA Business Management Software');
     
     //Verify text login 
-    let loginText = await page.getByText("Login");
-    console.log(loginText);
     await expect(page.locator(login)).toHaveText("Login");
 
     //password field varifications
