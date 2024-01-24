@@ -71,3 +71,5 @@ test("generateBill", async ({ page }) => {
     let stockUpdate = actualStockAvailable == expectedCurrentStock;
     console.log(stockUpdate);
 });
+
+
