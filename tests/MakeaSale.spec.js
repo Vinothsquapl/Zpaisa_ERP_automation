@@ -5,15 +5,17 @@ test.beforeEach(async ({ page }) => {
 
     test.setTimeout(120000);
     await login(page);
-    console.log('Executing common setup for all tests.');
 
   });
 
-test('Login Test', async ({ page }) => {
+test('stockdetails', async ({ page }) => {
 
-   
-    let stocks = await page.locator("//span[normalize-space()='Stocks']");
-    await stocks.click();
+    // add stock details
+  let stocks = await page.locator("//span[normalize-space()='Stocks']");
+  await stocks.click();
 
+  const stockItems = ['SAARTHI Engine Oil 10 L', 'Locking Washer', 'RUBBER BOOT', 'BOOT RUBBER','THRUST BEARING 51207' ]
+
+  
 
   });
