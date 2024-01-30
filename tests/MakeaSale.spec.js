@@ -23,8 +23,10 @@ test('stockdetails', async ({ page }) => {
     i < stockItems.length ;
     i++){
       await stockSearch.fill(stockItems[i]);
+      await page.waitForTimeout(2000);
       var stockValue = await page.$eval(availableStock, el => el.textContent);
       await initialStocksAvailable.push(stockValue);
+      await stockSearch.clear();
     }
 
     console.log(initialStocksAvailable);
@@ -43,8 +45,8 @@ test('stockdetails', async ({ page }) => {
 
   // add bill items and generate bill
     let requiredQuantity = "1";
-    let searchandAddItem = await page.getByRole('combobox', { name: 'Select Item Code' });//change path
-    let selectItem = await page.getByRole('option', { name: '10039928AA MRP ₹3,060.00' });//change path
+    let searchandAddItem = await page.getByRole('combobox', { name: 'Select Item Code' });
+    let selectItem = await page.locator('//mat-option[@class="mat-option mat-focus-indicator ng-star-inserted mat-active"]');
     let quantity = await page.getByLabel('Qty *');
     let newRow = await page.locator("//button[@class='mat-focus-indicator mat-stroked-button mat-button-base mat-primary']");
     let generateInvoice = page.locator("//button[@class='mat-focus-indicator cursor mat-raised-button mat-button-base mat-primary ng-star-inserted']");
@@ -53,7 +55,10 @@ test('stockdetails', async ({ page }) => {
     for(let i = 0; 
       i < stockItems.length;
       i++){
+        await searchandAddItem.clear();
         await searchandAddItem.fill(stockItems[i]);
+        await page.waitForTimeout(2000);
+        await searchandAddItem.click();
         await selectItem.click();
         await quantity.clear();
         await quantity.fill(requiredQuantity);
@@ -63,9 +68,9 @@ test('stockdetails', async ({ page }) => {
     await generateInvoice.click();
     await closePrintTab.click();
 
-  //check stock update
+  //check the updated stocks for the generated bill
   const actualStocksAvailable = [];
-  const expectedCurrentStock = [];
+  const stocksReduced = [];
 
   await stocks.click();
 
@@ -73,6 +78,7 @@ test('stockdetails', async ({ page }) => {
     i < stockItems.length ;
     i++){
       await stockSearch.fill(stockItems[i]);
+      await page.waitForTimeout(2000);
       var updatedStockValue = await page.$eval(availableStock, el => el.textContent);
       await actualStocksAvailable.push(updatedStockValue);
     }
@@ -84,26 +90,34 @@ test('stockdetails', async ({ page }) => {
   for (let i=0;
     i < initialStocksAvailable.length;
     i++){
-      await expectedCurrentStock.push((initialStocksAvailable[i]) - (actualStocksAvailable[i]));
+      await stocksReduced.push((initialStocksAvailable[i]) - (actualStocksAvailable[i]));
     }
 
-    console.log(expectedCurrentStock);
+    console.log(stocksReduced);
 
-  function stocksAreEqual (initialStocksAvailable, expectedCurrentStock){
+  const expectedCurrentStock = [];
+  for (let i=0;
+    i < initialStocksAvailable.length;
+    i++){
+        await expectedCurrentStock.push((initialStocksAvailable[i]) - (stocksReduced[i]));
+      }
 
-    if (initialStocksAvailable.length !== expectedCurrentStock.length){
-      console.log(false);
-    }
+      console.log(expectedCurrentStock);
+
+
+  // function to check if the expected stocks is equal to the actual stocks available after the update
+  function stocksAreEqual(actualStocksAvailable, expectedCurrentStock){
+
     for (let i = 0; 
-      i < initialStocksAvailable.length;
+      i < actualStocksAvailable.length;
       i++){
-        if ((initialStocksAvailable[i]) !== (expectedCurrentStock[i])){
-          console.log(false);
+        if ((actualStocksAvailable[i]) === (expectedCurrentStock[i])){
+          console.log(true);
         }
       }
-      return(true);
+      return (true);
   }
 
-  console.log(stocksAreEqual);
+  console.log(stocksAreEqual(actualStocksAvailable, expectedCurrentStock));
 
   });
