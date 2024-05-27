@@ -1,130 +1,106 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require("@playwright/test");
+// const {SuccessfullLogin} = require("./Login.spec");
+const url = "http://localhost:4200/login";
+let EmailAddress = "//input[@placeholder='youremail@gmail.com']";
+let password = "//input[@placeholder='password']";
+let signButton = "//span[normalize-space()='Login']"
+var bodyText
 
-const url =  "https://inventory.zpaisa.com";
-const login = "//div[@class='login-txt']";
-let signButton="//ion-button[@type='submit']";
-let KeepmeSignin="//span[@class='mat-checkbox-inner-container mat-checkbox-inner-container-no-side-margin']";
-var bodyText ;
+test('Verfication', async ({ page }) => {
+  test.setTimeout(120000);     // Open Zpaisa
+  await (page.goto(url, { timeout: 0 }));
 
-test('loginview', async ({ page }) => {
+  // Verify image
+  let PageLOGO = "//img[@src='/src/assets/svgs/Logo.svg']"
+  await expect(page.locator(PageLOGO)).toBeVisible
 
-    test.setTimeout(120000); 
-    // Open Zpaisa
-    await (page.goto(url, {timeout:0}));
+  //Email field verification
+  let Box = "//body/div[@id='root']/main[@class='_container_15ldl_1']/div[@class='_form-container_15ldl_7']/form[@class='ant-form ant-form-vertical ant-form-large css-dev-only-do-not-override-1xg9z9n _form-box_15ldl_16']/div[@class='_form-items_15ldl_23']"
 
-    // Verify image
-    let PageLOGO = "//img[@alt='zpaisa login']"
-    await expect(page.locator(PageLOGO)).toBeVisible
+  await expect(page.locator(EmailAddress)).toBeEditable;
+  await expect(page.locator(Box)).toContainText("Email");
 
-    // // Verify page title
-    //await expect(page.title).toBe('ZPAISA Business Management Software');
-    
-    //Verify text login 
-    await expect(page.locator(login)).toHaveText("Login");
+  //password field verifications
+  await expect(page.locator(password)).toBeEditable;
+  await expect(page.locator(Box)).toContainText("Password");
 
-    //password field varifications
-    let password = "//mat-label[@class='ng-tns-c173-1 ng-star-inserted']";
-    await expect(page.locator(password)).toBeEditable;
-    await expect(page.locator(password)).toHaveText("Password");
+  // signin button
+  await expect(page.locator(signButton)).toBeDisabled;
 
-    //mobile number field varification
-    let mobilenumber = "//mat-label[@class='ng-tns-c173-0 ng-star-inserted']";
-    await expect(page.locator(mobilenumber)).toBeEditable;
-    await expect(page.locator(mobilenumber)).toHaveText("Mobile Number");
+  //signin
+  let Signin = "//span[normalize-space()='Login']"
+  await expect(page.locator(Signin)).toBeChecked;
 
-    // signin button
-    await expect (page.locator(signButton)).toBeDisabled;
+  // // verification fro body 
+  // let bodytext ="body"
+  // await expect (bodytext).toContain("© 2024 Zpaisa, Inc. All rights reserved. ")
 
-    // keep me signed in checkbox
-    await expect (page.locator(KeepmeSignin)).toBeChecked;
-    
-    // Body text verifications
-    bodyText = await page.textContent('body');
-    await expect(bodyText).toContain("© 2022 All Rights Reserved. Squapl Digital Media Technologies");
-    await expect(bodyText).toContain("Don't have a ZPAISA account?");
-    await expect(bodyText).toContain("Keep Logged In");
-    await expect(bodyText).toContain("Sign Up Now");
-
+})
+// login with invalid creds
+test('Invalid username & password', async ({ page }) => {
+  await page.goto(url);
+  await page.locator(EmailAddress).fill('ABC');
+  await page.locator(password).fill('1234');
+  await page.locator(signButton).click();
+  bodyText = await page.textContent('body');
+  expect(bodyText).toContain("Input must be a valid email or a 10-digit phone number")
+  expect(bodyText).toContain("Password must be at least 6 characters long")
 });
+// valid creds
+test.only('Valid username & password', async ({ page }) => {
+  await page.goto(url);
+  await page.locator(EmailAddress).fill('9999999999');
+  await page.locator(password).fill('tts1234');
+  await page.locator(signButton).click();
+  await page.waitForTimeout(5000);
+  bodyText = await page.textContent('body');
+  expect(bodyText).toContain("Welcome to Dashboard")
+  //   });
+  // //  Brands 
+  //   test.only('Brands', async ({ page }) => {
+  //     await page.goto(url);
+  let Masters = "//span[text()='Masters']"
+  let Brands = "//a[text()='Brands']"
+  let Add = "//span[text()='Add']"
+  let BrandName = "//input[@placeholder='Brand Name']"
+  let IsActiveCheckbox = "//input[@type='checkbox']"
+  let Reset = "//span[text()='Reset']"
+  let Save = "//span[contains(text(),'Save')]"
+  let CreatedToastMessage = "//div[@class='ant-alert-message']"
 
-test('errorVerifications', async ({ page }) => {
+  await page.locator(Masters).click();
+  await page.locator(Brands).click();
+  // Add brands
+  await page.locator(Add).click();
+  await expect(page.locator(BrandName)).toBeEditable
+  await expect(page.locator(IsActiveCheckbox)).toBeChecked
+  await page.locator(BrandName).fill("Test brand name")
+  await page.locator(IsActiveCheckbox).click()
+  await (page.locator(IsActiveCheckbox)).uncheck
+  await page.locator(Reset).click;
+  await page.locator(BrandName).fill("Test brand name")
+  await page.locator(Save).click();
+  await page.waitForTimeout(3000);
 
-    test.setTimeout(120000);
-    // Open Zpaisa
-    await (page.goto(url, {timeout:0}));
+  // expect(bodyText).toContain("Brand added successfully")
+  var ToastMessage = await page.$eval(CreatedToastMessage, el => el.textContent);
+  // await page.check(ToastMessage).toBeVisible;
+  await page.waitForTimeout(1000);
 
-    // Error message when no data is entered
-    var mobilenumber = "//div[@class='mat-form-field-infix ng-tns-c173-0']";
-    await (page.click(mobilenumber));
-    var password = "//div[@class='mat-form-field-infix ng-tns-c173-1']";
-    await (page.click(password));
-    await (page.click(login));
-    await expect (page.locator(signButton)).toBeDisabled;
-    bodyText = await page.textContent('body');
-    expect(bodyText).toContain("Phone # is required");
-    expect(bodyText).toContain("Password is required");
-
-    // Incorrect phonenumber format
-    var mobilenumber = "//input[@id='mat-input-0']";
-    var password = "//input[@id='mat-input-1']";
-    await (page.locator(mobilenumber).fill("99999998ABC"));
-    await (page.click(password));
-    bodyText = await page.textContent('body');
-    expect(bodyText).toContain("Wrong phone # format");
-
-
-    //Error message when incorrect data is entered
-    await (page.locator(mobilenumber).fill("9999999888"));
-    await (page.locator(password).fill("123456"));
-    await expect (page.locator(signButton)).toBeEnabled;
-    await page.click(signButton);
-    // bodyText = await page.textContent('body');
-    // expect(bodyText).toContain("");
-    // expect(bodyText).toContain("");
-
-});
-
-test('SuccessfullLogin', async ({ page }) => {
-
-    test.setTimeout(120000);
-    // Open Zpaisa
-    await page.goto(url, {timeout:0});
-
-    // successfull login with keep me logged in disabled
-    await expect (page.locator(KeepmeSignin)).toBeChecked;
-    await page.click(KeepmeSignin);
-    await expect (page.locator(KeepmeSignin)).toBeDisabled;
-
-    var mobilenumber = "//input[@id='mat-input-0']";
-    var password = "//input[@id='mat-input-1']";
-    await (page.locator(mobilenumber).fill("9999999999"));
-    await (page.locator(password).fill("tts1234"));
-    await page.click(signButton);
-    //await page.waitForTimeout(5000);
-    await page.getByText(" Sri Subalaksmi Motors ");
-
-    //logout from session
-    let profile = "//div[@class='mat-menu-trigger bottom']";
-    await page.click(profile);
-    let logout = "//button[3]";
-    await page.click(logout);
-    await expect(page.locator(login)).toHaveText("Login");
+  // Seaching created record 
+  let SearchBox = "//input[@placeholder='Search...']"
+  let searchIcon = "//span[@class='anticon anticon-search']//*[name()='svg']"
+  let TestBrandName = "//td[text()='Test brand name']"
+  let Filter = "//div[@class='ant-select-selector']"
+  let FilterAllBrand = "//div[contains(text(),'List All Brands')]"
+  
+  await page.click(Filter);
+  await page.click(FilterAllBrand)
+  await page.locator(SearchBox).fill("Test brand name")
+  await page.locator(searchIcon).click();
+  await page.waitForTimeout(1000);
+  await page.click(TestBrandName);
+// Update the created 
 
 
-    // successfull login with keep me logged in enabled
-    await expect (page.locator(KeepmeSignin)).toBeDisabled;
-    await page.click(KeepmeSignin);
-    await expect (page.locator(KeepmeSignin)).toBeChecked;
-    await (page.locator(mobilenumber).fill("9999999999"));
-    await (page.locator(password).fill("tts1234"));
-    await page.click(signButton);
-    await page.waitForTimeout(5000);
-    await page.getByText(" Sri Subalaksmi Motors ");
-    //await expect(bodyText).toContain(" Sri Subalaksmi Motors ");
-
-
-
-});
-
-
-
+})
